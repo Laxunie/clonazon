@@ -1,22 +1,34 @@
 import React from 'react'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
+import { MdDelete } from "react-icons/md";
+import { removeFromCart } from '../store/cartSlice';
 
 const Cart = () => {
+    const dispatch = useDispatch();
     const cart = useSelector((state: RootState) => state.cart);
+
+    const handleRemoveFromCart = (id: string) => {
+        dispatch(removeFromCart(id));
+    }
+
   return (
     <div className='fixed right-0 top-10 w-1/4 h-full bg-white shadow-lg p-4 z-100'>
         <h2 className='text-lg font-bold mb-4'>Shopping Cart</h2>
         <div className='flex flex-col gap-4'>
             {cart.items.map(item => (
             <div key={item.id} className='flex justify-between'>
+                <img src={item.image} alt={item.title} className='w-16 h-16 object-cover' />
                 <span>{item.title}</span>
-                <span>{item.price}</span>
+                <span>{item.price.toFixed(2)}</span>
+                <span className='cursor-pointer' onClick={() => handleRemoveFromCart(item.id)}>
+                    <MdDelete />
+                </span>
             </div>
             ))}
         </div>
         <div className='mt-4'>
-            <h3 className='font-bold'>Total: ${cart.totalPrice}</h3>
+            <h3 className='font-bold'>Total: ${cart.totalPrice.toFixed(2)}</h3>
             <h3 className='font-bold'>Items: {cart.totalQuantity}</h3>
         </div>
     </div>

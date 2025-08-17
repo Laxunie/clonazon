@@ -2,7 +2,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router'
 import { addToCart } from '../store/cartSlice'
-
+import Rating from '@mui/material/Rating';
 
 type Product = {
     id: string
@@ -33,6 +33,7 @@ const ProductContainer = ({product}: ProductCardProps) => {
         <img src={product.image}/>
         <h3 className='font-normal'>{product.title}</h3>
         <h1 className='font-medium'>${product.price}</h1>
+        <Rating name="read-only" value={product.rating.rate} readOnly />
         <button onClick={handleAddToCart} className='bg-yellow-400 rounded-lg w-25 z-10'>Add to cart</button>
     </div>
   )

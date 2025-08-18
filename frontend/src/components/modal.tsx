@@ -4,11 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  title?: string;
   children: ReactNode;
 };
 
-const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
+const Modal = ({ isOpen, onClose, children }: ModalProps) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -28,14 +27,11 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
           >
             {/* Close button */}
             <button
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 cursor-pointer"
               onClick={onClose}
             >
               ✖
             </button>
-
-            {/* Title */}
-            {title && <h2 className="text-xl font-semibold mb-4">{title}</h2>}
 
             {/* Content */}
             <div>{children}</div>

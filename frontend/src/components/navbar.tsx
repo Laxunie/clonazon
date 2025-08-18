@@ -3,18 +3,30 @@ import { type RootState } from '../store/store';
 import { useSelector } from 'react-redux';
 import Cart from './cart';
 import Modal from './modal';
+import Login from './login';
+import SignUp from './signup';
 
 const Navbar = () => {
     const cart = useSelector((state: RootState) => state.cart);
     const [showCart, setShowCart] = useState<boolean>(false);
     const [signInModalOpen, setSignInModalOpen] = useState<boolean>(false);
-    
+    const [isLogin, setIsLogin] = React.useState(true);
+
+    const toggleAuthMode = () => {
+        setIsLogin(!isLogin);
+    }
+
     const handleCartClick = () => {
         setShowCart(!showCart);
     }
 
     const handleSignInClick = () => {
         setSignInModalOpen(true);
+    }
+
+    const handleModalClose = () => {
+        setIsLogin(true)
+        setSignInModalOpen(false);
     }
 
     return (
@@ -28,10 +40,8 @@ const Navbar = () => {
                     {showCart && <Cart />}
                 </div>
             </div>
-            <Modal isOpen={signInModalOpen} onClose={() => setSignInModalOpen(false)} title="Sign In">
-                <div>
-                    <h1>Sign In</h1>
-                </div>
+            <Modal isOpen={signInModalOpen} onClose={handleModalClose}>
+                {isLogin ? <Login toggleAuthMode={toggleAuthMode} /> : <SignUp toggleAuthMode={toggleAuthMode}/>}
             </Modal>
         </div>
     )

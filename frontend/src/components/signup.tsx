@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { AuthProps } from "../utils/types"
 import { Country, State, City } from 'country-state-city';
+import axios from 'axios';
 
 type FormData = {
   firstName: string;
@@ -25,6 +26,7 @@ const SignUp = ({ toggleAuthMode }: AuthProps) => {
     const [selectedCountry, setSelectedCountry] = useState<string>("");
     const [selectedState, setSelectedState] = useState<string>("");
     const [selectedCity, setSelectedCity] = useState<string>("");
+    const [passwordError, setPasswordError] = useState<string>('');
     const [form, setForm] = useState<FormData>({
         firstName: "",
         lastName: "",
@@ -53,19 +55,45 @@ const SignUp = ({ toggleAuthMode }: AuthProps) => {
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-          const { name, value } = e.target;
-            setForm(prev => ({
-                ...prev,
-                [name as keyof FormData]: value,
-            }));
+        const { name, value } = e.target;
+        setForm(prev => ({
+            ...prev,
+            [name as keyof FormData]: value,
+        }));
+
+        if (name === 'password' || name === 'confirmPassword') {
+            setPasswordError('');
+        }
     };
 
     const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        console.log(form);
-        console.log("Country:", selectedCountry);
-        console.log("State:", selectedState);
-        console.log("City:", selectedCity);
+        if (form.password !== form.confirmPassword) {
+            setPasswordError("Passwords don't match");
+            return;
+        }
+        
+        // Clear any existing password error
+        setPasswordError('');
+        
+
+        axios.post("http://localhost:5000/api/auth/signup", {
+            firstName: form.firstName,
+            lastName: form.lastName,
+            email: form.email,
+            phone: form.phone,
+            password: form.password,
+            address: form.address,
+            country: selectedCountry,
+            state: selectedState,
+            city: selectedCity
+        })
+        .then(response => {
+            console.log("User registered successfully:", response.data);
+        })
+        .catch(error => {
+            console.error("Error registering user:", error);
+        });
     }
 
     const regionLabels: Record<string, string> = {
@@ -85,9 +113,9 @@ const SignUp = ({ toggleAuthMode }: AuthProps) => {
         { name: "lastName", type: "text", placeholder: "Last Name" },
         { name: "email", type: "email", placeholder: "Email" },
         { name: "phone", type: "tel", placeholder: "Phone" },
+        { name: "address", type: "text", placeholder: "Address" },
         { name: "password", type: "password", placeholder: "Password" },
         { name: "confirmPassword", type: "password", placeholder: "Confirm Password" },
-        { name: "address", type: "text", placeholder: "Address" },
     ];
 
     return (
@@ -104,6 +132,11 @@ const SignUp = ({ toggleAuthMode }: AuthProps) => {
                     className="w-full px-3 py-2 rounded border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50"
                 />
             ))}
+            {passwordError && (
+                <div className="text-red-500 text-sm -mt-2 mb-1">
+                    {passwordError}
+                </div>
+            )}
             <select value={selectedCountry} onChange={handleCountryChange} className="w-full px-3 py-2 rounded border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50">
                 <option value="">Country</option>
                 {countries.map(country => (

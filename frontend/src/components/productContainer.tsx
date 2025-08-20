@@ -1,21 +1,8 @@
-import React from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router'
 import { addToCart } from '../store/cartSlice'
 import Rating from '@mui/material/Rating';
-
-type Product = {
-    id: string
-    title: string
-    description: string
-    price: number
-    category: string
-    image: string
-    rating: {
-      rate: number
-      count: number
-    }
-}
+import type { Product } from '../utils/fakeProducts';
 
 type ProductCardProps = {
   product: Product;

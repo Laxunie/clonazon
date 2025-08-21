@@ -1,6 +1,8 @@
 import type { AuthProps } from "../utils/types"
 import api, { setAccessToken } from "../api/axios";
 import { useState } from "react";
+import { setToken, setUser } from "../store/userSlice";
+import { useDispatch } from "react-redux";
 
 type FormData = {
   email: string;
@@ -16,7 +18,7 @@ type InputField = {
 };
 
 const Login = ({ toggleAuthMode }: AuthProps) => {
-
+  const dispatch = useDispatch();
   const [form, setForm] = useState<FormData>({
       email: "",
       password: ""
@@ -38,7 +40,8 @@ const Login = ({ toggleAuthMode }: AuthProps) => {
   const handleLogin = async (email: string, password: string) => {
     try {
       const response = await api.post("/auth/login", { email, password });
-      const { accessToken } = response.data;
+      const { accessToken, user } = response.data;
+      dispatch(setUser(user));
       setAccessToken(accessToken);
       console.log("Login successful, access token set:", accessToken);
     } catch (error) {

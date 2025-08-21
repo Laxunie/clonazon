@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 // Create Access Token
 export const generateAccessToken = (userId: string) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET!, {
+  return jwt.sign({ userId }, process.env.JWT_ACCESS_SECRET!, {
     expiresIn: "15m", // short-lived
   });
 };

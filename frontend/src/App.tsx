@@ -3,8 +3,10 @@ import { Home } from './pages'
 import { useEffect } from 'react';
 import { fetchProducts } from './store/productsSlice';
 import { useAppDispatch, type RootState } from './store/store';
+import useRestoreUser from './hooks/useRestoreUser';
 
 function App() {
+  useRestoreUser();
   const dispatch = useAppDispatch();
   const loading = useSelector((state: RootState) => state.products.loading);
 

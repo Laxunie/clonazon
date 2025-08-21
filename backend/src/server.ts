@@ -2,8 +2,11 @@ import express, { type Application, type Request, type Response } from 'express'
 import connectDB from './connect.js';
 import cors from 'cors';
 import userRoutes from './routes/userRoutes.js';
+import cookieParser from "cookie-parser";
+
 
 const app: Application = express();
+app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({

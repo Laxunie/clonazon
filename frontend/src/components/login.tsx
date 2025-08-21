@@ -1,8 +1,9 @@
-import type { AuthProps } from "../utils/types"
+import type { AuthProps } from "../utils/types";
 import api, { setAccessToken } from "../api/axios";
 import { useState } from "react";
-import { setToken, setUser } from "../store/userSlice";
+import { setUser } from "../store/userSlice";
 import { useDispatch } from "react-redux";
+import axios from "axios";
 
 type FormData = {
   email: string;
@@ -20,21 +21,19 @@ type InputField = {
 const Login = ({ toggleAuthMode }: AuthProps) => {
   const dispatch = useDispatch();
   const [form, setForm] = useState<FormData>({
-      email: "",
-      password: ""
+    email: "",
+    password: "",
   });
-  const [passwordError, setPasswordError] = useState<string>('');
+
+  const [error, setError] = useState<string>("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({
-        ...prev,
-        [name as keyof FormData]: value,
+      ...prev,
+      [name as FormKeys]: value,
     }));
-
-    if (name === 'password' || name === 'confirmPassword') {
-        setPasswordError('');
-    }
+    setError("");
   };
 
   const handleLogin = async (email: string, password: string) => {
@@ -44,33 +43,69 @@ const Login = ({ toggleAuthMode }: AuthProps) => {
       dispatch(setUser(user));
       setAccessToken(accessToken);
       console.log("Login successful, access token set:", accessToken);
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
-  }
+    } catch (err: unknown) {
+      let message = "Login failed";
 
-    const inputFields: InputField[] = [
-      { name: "email", type: "email", placeholder: "Email" },
-      { name: "password", type: "password", placeholder: "Password" },
-    ];
+      if (axios.isAxiosError(err)) {
+        // err is now typed as AxiosError
+        message = err.response?.data?.message || err.message;
+      } else if (err instanceof Error) {
+        // fallback for normal JS errors
+        message = err.message;
+      }
+
+      setError(message);
+      console.error("Login failed:", err);
+    }
+  };
+
+  const inputFields: InputField[] = [
+    { name: "email", type: "email", placeholder: "Email" },
+    { name: "password", type: "password", placeholder: "Password" },
+  ];
 
   return (
-    <div>
-      {inputFields.map(field => (
-          <input
-              key={field.name}
-              name={field.name}
-              type={field.type}
-              placeholder={field.placeholder}
-              value={form[field.name]}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 rounded border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50"
-          />
-      ))}
-        <button onClick={() => handleLogin(form.email, form.password)}>Login</button>
-        <span>Don't have an account? <button className='cursor-pointer' onClick={toggleAuthMode}>Sign up</button></span>
-    </div>
-  )
-}
+    <form className="bg-white rounded-xl shadow p-6 w-full max-w-md mx-auto flex flex-col gap-3 border border-gray-100">
+      <h2 className="text-xl font-semibold mb-2 text-center text-blue-600">Login</h2>
 
-export default Login
+      {inputFields.map(field => (
+        <input
+          key={field.name}
+          name={field.name}
+          type={field.type}
+          placeholder={field.placeholder}
+          value={form[field.name]}
+          onChange={handleInputChange}
+          className="w-full px-3 py-2 rounded border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50"
+        />
+      ))}
+
+      {error && (
+        <div className="text-red-500 text-sm -mt-2 mb-1">
+          {error}
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={() => handleLogin(form.email, form.password)}
+        className="w-full mt-2 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+      >
+        Login
+      </button>
+
+      <div className="text-center mt-2">
+        <span className="text-gray-500 text-sm">Don't have an account? </span>
+        <button
+          type="button"
+          className="text-blue-600 hover:underline text-sm font-medium"
+          onClick={toggleAuthMode}
+        >
+          Sign Up
+        </button>
+      </div>
+    </form>
+  );
+};
+
+export default Login;
